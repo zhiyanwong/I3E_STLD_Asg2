@@ -27,4 +27,9 @@ public class Coin : MonoBehaviour
     {
         GetComponent<Animator>().SetTrigger("isCollected");
     }
+    
+    void DestroyCoin()
+    {
+        Destroy(gameObject);
+    }
 }

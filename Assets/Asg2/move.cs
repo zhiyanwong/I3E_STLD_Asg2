@@ -17,9 +17,13 @@ public class move : MonoBehaviour
     public Transform Camera;
     int score = 0;
     public TextMeshProUGUI displayText;
+    public float jumpForce;
+    public Rigidbody rb;
+    public bool playerOnGround = true;
+    //public float sprintModifier = 5f;
+    //bool sprintKey = false;
 
-    public float sprintModifier = 5f;
-    bool sprintKey = false;
+    public bool dead = false;
 
     public bool CollectObject(string tag, GameObject obj, int val)
     {
@@ -32,10 +36,70 @@ public class move : MonoBehaviour
         }
         return false;
     }
-    private void OnCollisionEnter(Collision collision)
+    public void OnCollisionEnter(Collision collision)
     {
-        if (CollectObject("Collectible", collision.gameObject, 3)) ;
-        else if (CollectObject("Damage", collision.gameObject, -2)) ; 
+        //if (CollectObject("Collectible", collision.gameObject, 3)) ;
+        //else if (CollectObject("Damage", collision.gameObject, -2)) ; 
+
+
+        if (collision.gameObject.tag == "Collectible")
+        {
+            displayText.text = "Score : " + score + "/ 10";
+            score += 2;
+            //Debug.Log("Enter : " + collision.gameObject.name);
+            collision.gameObject.GetComponent<Coin>().Collected();
+            //Destroy(collision.gameObject);
+
+        }
+        else if (collision.gameObject.tag == "bugs")
+        {
+            //score -= 1;
+            displayText.text = "Score : " + score--;
+            Destroy(collision.gameObject);
+        }
+        else if (collision.gameObject.tag == "Trap")
+        {
+            GetComponent<Animator>().SetTrigger("Death");
+            dead = true;
+        }
+
+        if (collision.gameObject.tag == "ground")
+        {
+            playerOnGround = true;
+        }
+
+    }
+    public void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.tag == "Collectible")
+        {
+            displayText.text = "Score : " + score + "/ 10";
+            score += 2;
+            Debug.Log("Stay : " + collision.gameObject.name);
+        }
+        else if (collision.gameObject.tag == "bugs")
+        {
+            //score -= 1;
+            displayText.text = "Score : " + score--;
+
+        }
+    }
+
+    public void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Collectible")
+        {
+            displayText.text = "Score : " + score + "/ 10";
+            score += 2;
+            Debug.Log("Exit : " + collision.gameObject.name);
+        }
+
+        else if (collision.gameObject.tag == "bugs")
+        {
+            //score -= 1;
+            displayText.text = "Score : " + score--;
+
+        }
     }
     void OnLook(InputValue value)
     {
@@ -48,16 +112,26 @@ public class move : MonoBehaviour
 
         //Debug.Log(movementInput);
     }
+    void OnJump()
+    {
+        GetComponent<Rigidbody>().AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (dead == true)
+        {
+            return;
+        }
+
+        displayText.text = "Score : " + score + "/ 10";
         //Vector3 forwardDir = transform.forward;
         //forwardDir *= movementInput.y;
 
@@ -79,5 +153,16 @@ public class move : MonoBehaviour
         movementVector += transform.right * movementInput.x;
         transform.position += movementVector * movementSpeed;
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + rotationInput * rotationSpeed);
+
+        float horizontal = Input.GetAxis("Horizontal") * Time.deltaTime;
+        float vertical = Input.GetAxis("Vertical") * Time.deltaTime;
+
+        transform.Translate(horizontal, 0, vertical);
+
+        if (Input.GetButtonDown("Jump") && playerOnGround)
+        {
+            rb.AddForce(new Vector3(0, 10, 0), ForceMode.Impulse);
+            playerOnGround = false;
+        }
     }
 }
