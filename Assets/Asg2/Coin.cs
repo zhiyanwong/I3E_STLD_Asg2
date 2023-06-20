@@ -26,6 +26,8 @@ public class Coin : MonoBehaviour
     public void Collected()
     {
         GetComponent<Animator>().SetTrigger("isCollected");
+
+        GetComponent<AudioSource>().Play();
     }
     
     void DestroyCoin()
