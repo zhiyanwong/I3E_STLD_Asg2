@@ -7,8 +7,18 @@ public class Teleport : MonoBehaviour
     public Transform teleportTarget;
     public GameObject thePlayer;
 
+    
+    /// <summary>
+    /// Find the player, prefab player doesn't detect.
+    /// </summary>
+    private void Start()
+    {
+        thePlayer = FindObjectOfType<move>().gameObject;
+    }
+    /// Touch and teleport to teleporTarget
     private void OnTriggerEnter(Collider other)
     {
-       thePlayer.transform.position = teleportTarget.transform.position;
+        GetComponent<AudioSource>().Play();
+        thePlayer.transform.position = teleportTarget.transform.position;
     }
 }

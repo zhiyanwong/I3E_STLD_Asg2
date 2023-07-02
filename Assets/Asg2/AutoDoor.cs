@@ -6,14 +6,20 @@ public class AutoDoor : MonoBehaviour
 {
     public Animator doorAnimator;
 
+    /// <summary>
+    /// Trigger of the door open when player touch the collider
+    /// </summary>
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Player")
+        GetComponent<AudioSource>().Play();
+        if (other.tag == "Player")
         {
             doorAnimator.SetBool("DoorOpen", true);
         }
     }
-
+    /// <summary>
+    /// Trigger of the door close when player exit the collider
+    /// </summary>
     private void OnTriggerExit(Collider other)
     {
         if (other.tag == "Player")

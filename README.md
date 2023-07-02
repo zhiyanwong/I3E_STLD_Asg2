@@ -13,3 +13,6 @@ On the Week07 was trying debug the code at the quiz.
 
 Week08
 Finally complete doing repository using github desktop and had to resubmit the link again. Week08 i learned about 
+
+Week11
+On Week11 i learned about creating a menu using UI canvas and stuff. At the starting of any game will have starting menu and options. It is very useful for my assignment 2. Also learn how make the game freeze and pause and resume. It is very confusing when creating it but it is fun creating it.

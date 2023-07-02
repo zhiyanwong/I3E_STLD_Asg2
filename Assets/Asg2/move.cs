@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class move : MonoBehaviour
 {
     Vector3 movementInput = Vector3.zero;
-    float movementSpeed = 3f;
+    public float movementSpeed = 3f;
 
     Vector3 rotationInput = Vector3.zero;
     float rotationSpeed = 60f;
@@ -37,17 +37,21 @@ public class move : MonoBehaviour
 
     //bool interact = false;
 
-    public bool CollectObject(string tag, GameObject obj, int val)
-    {
-        if (obj.tag == tag)
-        {
-            score += val;
-            displayText.text = "Score : " + score;
-            Destroy(obj);
-            return true;
-        }
-        return false;
-    }
+    //public bool CollectObject(string tag, GameObject obj, int val)
+    //{
+    //    if (obj.tag == tag)
+    //    {
+    //        score += val;
+    //        displayText.text = "Score : " + score;
+    //        Destroy(obj);
+    //        return true;
+    //    }
+    //    return false;
+    //}
+    /// <summary>
+    /// Hit Object and collect, points will increase
+    /// </summary>
+    /// <param name="collision"></param>
     public void OnCollisionEnter(Collision collision)
     {
         //if (CollectObject("Collectible", collision.gameObject, 3)) ;
@@ -55,40 +59,22 @@ public class move : MonoBehaviour
 
         if (collision.gameObject.tag == "Points")
         {
-            //displayText.text = "Score : " + score + "/ 10";
-            //score += 2;
+            displayText.text = "Parts : " + score + "/ 5 Collected";
+            score ++;
             //Debug.Log("Enter : " + collision.gameObject.name);
             collision.gameObject.GetComponent<Coin>().Collected();
             //Destroy(collision.gameObject);
 
         }
-        if (collision.gameObject.tag == "Collectible")
-        {
-            displayText.text = "Score : " + score + "/ 3 Collected";
-            score ++;
-            //Debug.Log("Enter : " + collision.gameObject.name);
-            //collision.gameObject.GetComponent<Coin>().Collected();
-            Destroy(collision.gameObject);
-
-        }
-        else if (collision.gameObject.tag == "bugs")
-        {
-            //score -= 1;
-            displayText.text = "Score : " + score--;
-            Destroy(collision.gameObject);
-        }
-        else if (collision.gameObject.tag == "Trap")
-        {
-            
-            KillPlayer();
-        }
-
         if (collision.gameObject.tag == "ground")
         {
             playerOnGround = true;
         }
 
     }
+    /// <summary>
+    /// When player dies will trigger audio and animation
+    /// </summary>
     void KillPlayer()
     {
         GetComponent<Animator>().SetTrigger("Death");
@@ -97,61 +83,41 @@ public class move : MonoBehaviour
         GetComponent<AudioSource>().Play();
 
     }
-    public void OnCollisionStay(Collision collision)
-    {
-        if (collision.gameObject.tag == "Collectible")
-        {
-            displayText.text = "Score : " + score + "/ 3";
-            score ++;
-            Debug.Log("Stay : " + collision.gameObject.name);
-        }
-        else if (collision.gameObject.tag == "bugs")
-        {
-            //score -= 1;
-            displayText.text = "Score : " + score--;
-
-        }
-    }
-
-    public void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.tag == "Collectible")
-        {
-            displayText.text = "Score : " + score + "/ 3";
-            score ++;
-            Debug.Log("Exit : " + collision.gameObject.name);
-        }
-
-        else if (collision.gameObject.tag == "bugs")
-        {
-            //score -= 1;
-            displayText.text = "Score : " + score--;
-
-        }
-    }
+    /// <summary>
+    /// For the rotation of the camera view
+    /// </summary>
     void OnLook(InputValue value)
     {
         rotationInput.y = value.Get<Vector2>().x;
         headRot.x = value.Get<Vector2>().y * -1; 
     }
+    /// <summary>
+    /// Movement
+    /// </summary>
     void OnMove(InputValue value)
     {
         movementInput = value.Get<Vector2>();
 
         //Debug.Log(movementInput);
     }
+
+    /// <summary>
+    /// To let player Jump vertically
+    /// </summary>
     void OnJump()
     {
         GetComponent<Rigidbody>().AddForce(transform.up * jumpForce, ForceMode.Impulse);
     }
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// Start is called before the first frame update
+    /// </summary>
     void Start()
     {
         rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
+    /// Update is called once per frame
     void Update()
     {
         if (dead == true)
@@ -159,7 +125,12 @@ public class move : MonoBehaviour
             return;
         }
 
-        displayText.text = "Score : " + score + "/ 3";
+        ///At the Beggining, the text will show how many parts need to be collected
+        displayText.text = "Parts : " + score + "/ 5 Collected";
+        if (score > 4)
+        {
+            displayText.text = "All parts have been collected! ";
+        }
         //Vector3 forwardDir = transform.forward;
         //forwardDir *= movementInput.y;
 
@@ -177,19 +148,19 @@ public class move : MonoBehaviour
         //    * rotationSpeed;
         //Camera.rotation = Quaternion.Euler(headRot);
 
-        //Up or down
+        ///forward and backward
         Vector3 movementVector = transform.forward * movementInput.y;
 
-        //left or right
+        ///left or right
         movementVector += transform.right * movementInput.x;
 
-        //Movement vector * move speed
+        ///Movement vector * move speed
         transform.position += movementVector * movementSpeed * Time.deltaTime;
 
-        //rotation
+        ///rotation
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + rotationInput * rotationSpeed * Time.deltaTime);
 
-        //rotation up and down camera only
+        ///rotation up and down camera only
         playerCamera.transform.rotation = Quaternion.Euler(playerCamera.transform.rotation.eulerAngles + headRot * rotationSpeed * Time.deltaTime);
         headRot.y = Mathf.Clamp(headRot.y, -80f, 80f);
         
@@ -200,12 +171,14 @@ public class move : MonoBehaviour
 
         transform.Translate(horizontal, 0, vertical);
 
+        ///Player can only jump once when it touch the tag model call ground
         if (Input.GetButtonDown("Jump") && playerOnGround)
         {
             rb.AddForce(new Vector3(0, 10, 0), ForceMode.Impulse);
             playerOnGround = false;
         }
 
+        ///Show the raycast line and info what has it hit.
         Debug.DrawLine(transform.position, transform.position + (transform.forward * interactionDis));
         RaycastHit hitInfo;
         if (Physics.Raycast(transform.position, transform.forward, out hitInfo, interactionDis))
@@ -223,6 +196,10 @@ public class move : MonoBehaviour
         }
         mouseClick = false;
     }
+
+    /// <summary>
+    /// Firing 
+    /// </summary>
     void OnFire()
     {
         //interact = true;

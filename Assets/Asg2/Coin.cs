@@ -6,30 +6,29 @@ public class Coin : MonoBehaviour
 {
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    //void IdleComplete()
+    //{
+    //    Debug.Log("Idle Animation Complete");
+    //}
 
-    void IdleComplete()
-    {
-        //Debug.Log("Idle Animation Complete");
-    }
-
+    /// <summary>
+    /// Trigger collected animation and sound
+    /// </summary>
     public void Collected()
     {
-        GetComponent<Animator>().SetTrigger("isCollected");
 
+        //Debug.Log("Parts Collected");
         GetComponent<AudioSource>().Play();
+        //GetComponent<Animator>().SetTrigger("isCollected");
+
+        
+        DestroyCoin();
     }
     
+    /// <summary>
+    /// Destroy coin when collect
+    /// </summary>
     void DestroyCoin()
     {
         Destroy(gameObject);
